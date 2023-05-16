@@ -25,7 +25,7 @@ class ImageGalleryItem extends React.Component {
     } else if (prevProps.searchName !== this.props.searchName) {
       this.setState({ loading: true });
       fetch(
-        `https://pixabay.com/api/?q=${this.props.searchName}&page=1&key=34736724-43de875ebed23001707db1297&image_type=photo&orientation=horizontal&per_page=${this.props.perPage}`
+        `https://pixabay.com/api/?q=${this.props.searchName}&page=${this.props.page}&key=34736724-43de875ebed23001707db1297&image_type=photo&orientation=horizontal&per_page=${this.props.perPage}`
       )
         .then(res => res.json())
         .then(data => this.setState({ images: data.hits }))

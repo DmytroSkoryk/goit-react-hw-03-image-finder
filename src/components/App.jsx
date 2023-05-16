@@ -14,11 +14,11 @@ class App extends React.Component {
     perPage: 12,
     page: 1,
     isLoading: false,
-    isVisible: false, // додайте стан isVisible
+    isVisible: false,
   };
 
   formSubmitHandler = searchName => {
-    this.setState({ isLoading: true, isVisible: true }); // встановлюємо isVisible в true
+    this.setState({ isLoading: true, isVisible: true, page: 1 });
     fetch(
       `https://pixabay.com/api/?q=${searchName}&page=1&key=34736724-43de875ebed23001707db1297&image_type=photo&orientation=horizontal&per_page=${this.state.perPage}`
     )
@@ -26,7 +26,12 @@ class App extends React.Component {
       .then(data =>
         this.setState({
           searchName,
-          images: data.hits,
+          images: data.hits.map(image => ({
+            id: image.id,
+            webformatURL: image.webformatURL,
+            largeImageURL: image.largeImageURL,
+            tags: image.tags,
+          })),
           isLoading: false,
         })
       );
@@ -42,7 +47,15 @@ class App extends React.Component {
       .then(res => res.json())
       .then(data =>
         this.setState(prevState => ({
-          images: [...prevState.images, ...data.hits],
+          images: [
+            ...prevState.images,
+            ...data.hits.map(image => ({
+              id: image.id,
+              webformatURL: image.webformatURL,
+              largeImageURL: image.largeImageURL,
+              tags: image.tags,
+            })),
+          ],
           page: nextPage,
           isLoading: false,
         }))
@@ -60,13 +73,17 @@ class App extends React.Component {
         />
         <ToastContainer autoClose={3000} theme="colored" />
         {this.state.isLoading && <Loader />}
-        <Button
-          onClick={this.onAddImages}
-          isVisible={this.state.isVisible}
-        />{' '}
-        {/* передайте isVisible у пропсах */}
+        {this.state.isVisible &&
+          this.state.images.length % this.state.perPage === 0 &&
+          this.state.images.length > 0 && (
+            <Button
+              onClick={this.onAddImages}
+              isVisible={this.state.isVisible}
+            />
+          )}
       </div>
     );
   }
 }
+
 export default App;
